@@ -1,7 +1,6 @@
 # AltTab
 
-A minimal, from-scratch Swift recreation of [alt-tab.app](https://alt-tab.app/)'s
-"Titles" style: a keyboard window switcher for the windows of the **current app**.
+A minimal keyboard window switcher for the windows of the **current app**.
 Menu-bar-only, no Dock icon, ~500 lines of Swift, zero dependencies.
 
 ```
@@ -72,8 +71,8 @@ main.swift ─▶ AppDelegate ─▶ KeyboardHook (CGEventTap: ⌥⇥ intercept)
 Notable implementation details:
 
 - A `CGEventTap` swallows ⌥⇥ before it reaches the focused app.
-- Window ↔ AX matching uses the private `_AXUIElementGetWindow` (same approach
-  as the original AltTab); z-order comes from `CGWindowListCopyWindowInfo`.
+- Window ↔ AX matching uses the private `_AXUIElementGetWindow`;
+  z-order comes from `CGWindowListCopyWindowInfo`.
 - The panel is a borderless `.nonactivatingPanel` — it never steals focus.
 
 ## Limitations
@@ -83,5 +82,4 @@ Notable implementation details:
 
 ## License
 
-[MIT](LICENSE). Not affiliated with the original
-[AltTab](https://alt-tab.app/) — this is an independent educational recreation.
+[MIT](LICENSE)
