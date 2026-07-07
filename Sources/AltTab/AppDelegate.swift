@@ -1,8 +1,10 @@
 import AppKit
+import ServiceManagement
 
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var statusItem: NSStatusItem!
     private var permissionMenuItem: NSMenuItem!
+    private var loginItem: NSMenuItem!
     private let switcher = Switcher()
     private var keyboardHook: KeyboardHook?
     private var permissionTimer: Timer?
@@ -28,6 +30,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         permissionMenuItem.isEnabled = false
         menu.addItem(permissionMenuItem)
         menu.addItem(.separator())
+        loginItem = NSMenuItem(title: "Start at Login", action: #selector(toggleLoginItem), keyEquivalent: "")
+        loginItem.target = self
+        menu.addItem(loginItem)
+        menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Quit AltTab", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
         statusItem.menu = menu
     }
@@ -38,6 +44,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         permissionMenuItem.title = trusted
             ? (hooked ? "Accessibility: ✓ active" : "Accessibility: ✓ (hook failed — relaunch)")
             : "Accessibility: ✗ grant in System Settings"
+        loginItem.state = (SMAppService.mainApp.status == .enabled) ? .on : .off
+    }
+
+    @objc private func toggleLoginItem() {
+        do {
+            if SMAppService.mainApp.status == .enabled {
+                try SMAppService.mainApp.unregister()
+            } else {
+                try SMAppService.mainApp.register()
+            }
+        } catch {
+            NSLog("AltTab: failed to toggle login item: \(error)")
+            let alert = NSAlert()
+            alert.messageText = "Couldn't change Start at Login"
+            alert.informativeText = error.localizedDescription
+            alert.runModal()
+        }
     }
 
     private func requestPermissions() {
