@@ -10,6 +10,7 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp .build/release/AltTab "$APP/Contents/MacOS/AltTab"
 cp Info.plist "$APP/Contents/Info.plist"
+cp branding/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 
 # Sign with a real identity when available: TCC ties the Accessibility grant
 # to the code signature, and ad-hoc signatures change on every rebuild —
