@@ -83,10 +83,25 @@ struct SwitcherView: View {
 private struct WindowRow: View {
     static let folderFont = NSFont.monospacedSystemFont(ofSize: 11, weight: .medium)
 
+    @Environment(\.colorScheme) private var colorScheme
+
     let window: SwitcherWindow
     let isSelected: Bool
     /// Shared width of the leading folder column, so titles line up across rows.
     let folderWidth: CGFloat
+
+    /// The system accent color, retuned so it reads against the HUD blur in
+    /// either appearance: lifted off the dark one, deepened on the light one.
+    private var folderColor: Color {
+        let accent = NSColor.controlAccentColor.usingColorSpace(.deviceRGB) ?? .systemBlue
+        var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
+        accent.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+
+        let tuned = colorScheme == .dark
+            ? NSColor(hue: hue, saturation: saturation * 0.7, brightness: min(brightness * 1.35, 1), alpha: 1)
+            : NSColor(hue: hue, saturation: min(saturation * 1.1, 1), brightness: brightness * 0.8, alpha: 1)
+        return Color(nsColor: tuned).opacity(isSelected ? 1 : 0.7)
+    }
 
     var body: some View {
         HStack(spacing: 8) {
@@ -95,7 +110,7 @@ private struct WindowRow: View {
                     .font(Font(WindowRow.folderFont))
                     .lineLimit(1)
                     .truncationMode(.head) // keep the tail, it is the distinctive part
-                    .foregroundColor(.primary.opacity(isSelected ? 0.55 : 0.35))
+                    .foregroundColor(folderColor)
                     .frame(width: folderWidth, alignment: .trailing)
 
                 Rectangle()
