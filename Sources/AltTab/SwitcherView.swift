@@ -14,7 +14,11 @@ struct SwitcherView: View {
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 2) {
                         ForEach(Array(model.windows.enumerated()), id: \.element.id) { index, window in
-                            WindowRow(window: window, isSelected: index == model.selectedIndex)
+                            WindowRow(
+                                window: window,
+                                isSelected: index == model.selectedIndex,
+                                folderWidth: folderColumnWidth
+                            )
                                 .id(index)
                                 .onTapGesture { model.onCommit?(index) }
                                 .onHover { hovering in
@@ -59,6 +63,16 @@ struct SwitcherView: View {
         }
     }
 
+    /// Width of the leading folder column: the widest folder name in the list,
+    /// so every title starts on the same x. Zero when no window reports a folder.
+    private var folderColumnWidth: CGFloat {
+        let widest = model.windows
+            .compactMap(\.folder)
+            .map { ($0 as NSString).size(withAttributes: [.font: WindowRow.folderFont]).width }
+            .max() ?? 0
+        return widest == 0 ? 0 : min(ceil(widest), 150)
+    }
+
     private var rowsHeight: CGFloat {
         let rowHeight: CGFloat = 30 + 2 // row + spacing
         let visible = min(model.windows.count, maxVisibleRows)
@@ -67,11 +81,27 @@ struct SwitcherView: View {
 }
 
 private struct WindowRow: View {
+    static let folderFont = NSFont.monospacedSystemFont(ofSize: 11, weight: .medium)
+
     let window: SwitcherWindow
     let isSelected: Bool
+    /// Shared width of the leading folder column, so titles line up across rows.
+    let folderWidth: CGFloat
 
     var body: some View {
         HStack(spacing: 8) {
+            if folderWidth > 0 {
+                Text(window.folder ?? "")
+                    .font(Font(WindowRow.folderFont))
+                    .lineLimit(1)
+                    .truncationMode(.head) // keep the tail, it is the distinctive part
+                    .foregroundColor(.primary.opacity(isSelected ? 0.55 : 0.35))
+                    .frame(width: folderWidth, alignment: .trailing)
+
+                Rectangle()
+                    .fill(Color.primary.opacity(isSelected ? 0.2 : 0.12))
+                    .frame(width: 1, height: 16)
+            }
             if let icon = window.icon {
                 Image(nsImage: icon)
                     .resizable()
@@ -82,7 +112,7 @@ private struct WindowRow: View {
                 .lineLimit(1)
                 .fixedSize(horizontal: true, vertical: false) // size to full title, never truncate
                 .foregroundColor(isSelected ? .primary : .secondary)
-            Spacer(minLength: 0)
+            Spacer(minLength: 12)
             if window.isMinimized {
                 Image(systemName: "minus.circle")
                     .font(.system(size: 11))

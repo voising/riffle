@@ -13,6 +13,8 @@ struct SwitcherWindow: Identifiable {
     let title: String
     let icon: NSImage?
     let isMinimized: Bool
+    /// Name of the working folder, for apps that publish one (terminals, document apps).
+    let folder: String?
     let axWindow: AXUIElement
 
     var displayTitle: String { title.isEmpty ? appName : title }
@@ -54,6 +56,7 @@ enum WindowDiscovery {
                 title: attribute(element, kAXTitleAttribute) ?? "",
                 icon: icon,
                 isMinimized: attribute(element, kAXMinimizedAttribute) ?? false,
+                folder: folder(of: element),
                 axWindow: element
             ))
         }
@@ -84,6 +87,26 @@ enum WindowDiscovery {
             order[windowID] = order.count
         }
         return order
+    }
+
+    /// Terminals that report their cwd (Ghostty, Terminal.app, iTerm2 via the
+    /// proxy icon) expose it as AXDocument; document apps expose the open file.
+    /// Only the folder name is kept — it is what identifies the project at a glance.
+    private static func folder(of element: AXUIElement) -> String? {
+        guard
+            let document: String = attribute(element, kAXDocumentAttribute),
+            let url = URL(string: document), url.isFileURL
+        else { return nil }
+
+        var isDirectory: ObjCBool = false
+        FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory)
+        let directory = isDirectory.boolValue ? url : url.deletingLastPathComponent()
+
+        switch directory.path {
+        case NSHomeDirectory(): return "~"
+        case "/": return "/"
+        default: return directory.lastPathComponent
+        }
     }
 
     private static func attribute<T>(_ element: AXUIElement, _ name: String) -> T? {
