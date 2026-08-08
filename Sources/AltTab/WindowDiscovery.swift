@@ -18,6 +18,22 @@ struct SwitcherWindow: Identifiable {
     let axWindow: AXUIElement
 
     var displayTitle: String { title.isEmpty ? appName : title }
+
+    /// Everything the user might reasonably type to find this window.
+    var searchHaystack: String {
+        [folder, displayTitle, appName].compactMap { $0 }.joined(separator: " ")
+    }
+
+    /// Case-insensitive match: every whitespace-separated term must appear
+    /// somewhere, so "src index" finds "src — index.ts" regardless of order.
+    static func filter(_ windows: [SwitcherWindow], query: String) -> [SwitcherWindow] {
+        let terms = query.lowercased().split(separator: " ").map(String.init)
+        guard !terms.isEmpty else { return windows }
+        return windows.filter { window in
+            let haystack = window.searchHaystack.lowercased()
+            return terms.allSatisfy { haystack.contains($0) }
+        }
+    }
 }
 
 enum WindowDiscovery {

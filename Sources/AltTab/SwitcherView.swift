@@ -4,39 +4,53 @@ struct SwitcherView: View {
     @ObservedObject var model: SwitcherViewModel
 
     private let minListWidth: CGFloat = 320
+    private let searchWidth: CGFloat = 400
     private let maxVisibleRows = 12
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             header
 
-            ScrollViewReader { proxy in
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(spacing: 2) {
-                        ForEach(Array(model.windows.enumerated()), id: \.element.id) { index, window in
-                            WindowRow(
-                                window: window,
-                                isSelected: index == model.selectedIndex,
-                                folderWidth: folderColumnWidth
-                            )
-                                .id(index)
-                                .onTapGesture { model.onCommit?(index) }
-                                .onHover { hovering in
-                                    if hovering { model.selectedIndex = index }
-                                }
+            if model.isSearching {
+                SearchField(query: model.query)
+                    .padding(.bottom, 4)
+            }
+
+            if model.windows.isEmpty {
+                Text("No matching window")
+                    .font(.system(size: 12))
+                    .foregroundColor(.secondary)
+                    .frame(height: 30)
+                    .padding(.horizontal, 8)
+            } else {
+                ScrollViewReader { proxy in
+                    ScrollView(.vertical, showsIndicators: false) {
+                        VStack(spacing: 2) {
+                            ForEach(Array(model.windows.enumerated()), id: \.element.id) { index, window in
+                                WindowRow(
+                                    window: window,
+                                    isSelected: index == model.selectedIndex,
+                                    folderWidth: folderColumnWidth
+                                )
+                                    .id(index)
+                                    .onTapGesture { model.onCommit?(index) }
+                                    .onHover { hovering in
+                                        if hovering { model.selectedIndex = index }
+                                    }
+                            }
                         }
                     }
-                }
-                .frame(height: rowsHeight)
-                .onChange(of: model.selectedIndex) { newIndex in
-                    withAnimation(.easeOut(duration: 0.12)) {
-                        proxy.scrollTo(newIndex)
+                    .frame(height: rowsHeight)
+                    .onChange(of: model.selectedIndex) { newIndex in
+                        withAnimation(.easeOut(duration: 0.12)) {
+                            proxy.scrollTo(newIndex)
+                        }
                     }
                 }
             }
         }
         .padding(12)
-        .frame(minWidth: minListWidth, alignment: .leading)
+        .frame(minWidth: model.isSearching ? searchWidth : minListWidth, alignment: .leading)
         .background(VisualEffectBackground())
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
@@ -77,6 +91,52 @@ struct SwitcherView: View {
         let rowHeight: CGFloat = 30 + 2 // row + spacing
         let visible = min(model.windows.count, maxVisibleRows)
         return max(CGFloat(visible) * rowHeight - 2, rowHeight - 2)
+    }
+}
+
+/// A read-only stand-in for a text field: the panel never takes key focus, so
+/// the query is fed in from the event tap and merely rendered here.
+private struct SearchField: View {
+    let query: String
+
+    @State private var caretVisible = true
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(.secondary)
+
+            ZStack(alignment: .leading) {
+                if query.isEmpty {
+                    Text("Search windows…")
+                        .font(.system(size: 13))
+                        .foregroundColor(.secondary.opacity(0.7))
+                }
+                HStack(spacing: 1) {
+                    Text(query)
+                        .font(.system(size: 13))
+                        .foregroundColor(.primary)
+                        .lineLimit(1)
+                    Rectangle()
+                        .fill(Color.primary)
+                        .frame(width: 1.5, height: 15)
+                        .opacity(caretVisible ? 1 : 0)
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 8)
+        .frame(height: 28)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color.primary.opacity(0.08))
+        )
+        .onAppear {
+            withAnimation(.easeInOut(duration: 0.5).repeatForever()) {
+                caretVisible = false
+            }
+        }
     }
 }
 

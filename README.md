@@ -26,6 +26,8 @@ Menu-bar-only, no Dock icon, ~500 lines of Swift, zero dependencies.
 - Windows ordered front-to-back (most recently used first)
 - Panel auto-sizes to the longest title and centers on the screen under your mouse
 - Mouse support: hover to select, click to focus
+- Optional **Stay Open to Search** (menu bar toggle): the panel survives the ⌥
+  release so you can type to filter the list
 
 ## Keys
 
@@ -35,6 +37,23 @@ Menu-bar-only, no Dock icon, ~500 lines of Swift, zero dependencies.
 | ⌥ ⇧ ⇥ / ⌥ ↑ / ⌥ ← | previous window               |
 | release ⌥ / ⏎     | focus selected window         |
 | ⎋                 | cancel                        |
+
+### Search mode
+
+With **Stay Open to Search** enabled (menu bar → toggle), releasing ⌥ leaves the
+panel up with a search field instead of committing:
+
+| Keys        | Action                                        |
+|-------------|-----------------------------------------------|
+| any letters | filter by folder, title or app name (all terms must match, order-free) |
+| ⇥ / ⇧⇥ / ↑↓ | move the selection                            |
+| ⌫           | delete a character                            |
+| ⏎ / click   | focus selected window                         |
+| ⎋           | clear the query, then cancel                  |
+
+The panel still never takes key focus — keystrokes are read from the event tap
+and swallowed, so nothing leaks into the app underneath. A click anywhere else,
+or any ⌘/⌃ shortcut, dismisses it.
 
 ## Build & install
 
@@ -78,7 +97,7 @@ Notable implementation details:
 ## Limitations
 
 - Switches within the current app only (that's the point); no across-app mode
-- Shortcuts are not configurable; no search, no thumbnails
+- Shortcuts are not configurable; no thumbnails
 
 ## License
 

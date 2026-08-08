@@ -52,7 +52,7 @@ final class KeyboardHook {
 
         if type == .flagsChanged {
             if switcher.isActive && !optionDown {
-                DispatchQueue.main.async { self.switcher.commit() }
+                DispatchQueue.main.async { self.switcher.optionReleased() }
             }
             return Unmanaged.passUnretained(event)
         }
@@ -71,25 +71,71 @@ final class KeyboardHook {
             return nil // swallow: never type a tab into the focused app
         }
 
-        if switcher.isActive {
-            switch keyCode {
-            case kVK_Escape:
-                DispatchQueue.main.async { self.switcher.cancel() }
-                return nil
-            case kVK_RightArrow, kVK_DownArrow:
-                DispatchQueue.main.async { self.switcher.advance(reverse: false) }
-                return nil
-            case kVK_LeftArrow, kVK_UpArrow:
-                DispatchQueue.main.async { self.switcher.advance(reverse: true) }
-                return nil
-            case kVK_Return:
-                DispatchQueue.main.async { self.switcher.commit() }
-                return nil
-            default:
-                break
+        guard switcher.isActive else { return Unmanaged.passUnretained(event) }
+        let searching = switcher.isSearching
+
+        // System shortcuts (⌘Q, ⌘Space…) win: step aside and let them run.
+        if flags.contains(.maskCommand) || flags.contains(.maskControl) {
+            DispatchQueue.main.async { self.switcher.cancel() }
+            return Unmanaged.passUnretained(event)
+        }
+
+        switch keyCode {
+        case kVK_Escape:
+            DispatchQueue.main.async { self.switcher.clearQueryOrCancel() }
+            return nil
+        case kVK_Tab:
+            DispatchQueue.main.async { self.switcher.advance(reverse: shiftDown) }
+            return nil
+        case kVK_DownArrow:
+            DispatchQueue.main.async { self.switcher.advance(reverse: false) }
+            return nil
+        case kVK_UpArrow:
+            DispatchQueue.main.async { self.switcher.advance(reverse: true) }
+            return nil
+        // While typing, ←/→ belong to the query field's neighbourhood, not to
+        // selection; only steer with them when there is no query field.
+        case kVK_RightArrow where !searching:
+            DispatchQueue.main.async { self.switcher.advance(reverse: false) }
+            return nil
+        case kVK_LeftArrow where !searching:
+            DispatchQueue.main.async { self.switcher.advance(reverse: true) }
+            return nil
+        case kVK_Return, kVK_ANSI_KeypadEnter:
+            DispatchQueue.main.async { self.switcher.commit() }
+            return nil
+        case kVK_Delete where searching:
+            DispatchQueue.main.async { self.switcher.deleteBackward() }
+            return nil
+        default:
+            break
+        }
+
+        // Anything else typed while the search panel is up goes into the query,
+        // and must not leak into the app that still holds focus.
+        if searching {
+            if let text = typedText(from: event), !text.isEmpty {
+                DispatchQueue.main.async { self.switcher.type(text) }
             }
+            return nil
         }
 
         return Unmanaged.passUnretained(event)
+    }
+
+    /// Printable characters produced by the event, control codes stripped.
+    private func typedText(from event: CGEvent) -> String? {
+        var length = 0
+        var buffer = [UniChar](repeating: 0, count: 8)
+        event.keyboardGetUnicodeString(
+            maxStringLength: buffer.count,
+            actualStringLength: &length,
+            unicodeString: &buffer
+        )
+        guard length > 0 else { return nil }
+        return String(utf16CodeUnits: buffer, count: length)
+            .unicodeScalars
+            .filter { !CharacterSet.controlCharacters.contains($0) }
+            .reduce(into: "") { $0.unicodeScalars.append($1) }
     }
 }

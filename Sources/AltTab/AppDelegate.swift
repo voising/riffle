@@ -5,6 +5,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var statusItem: NSStatusItem!
     private var permissionMenuItem: NSMenuItem!
     private var loginItem: NSMenuItem!
+    private var searchModeItem: NSMenuItem!
     private let switcher = Switcher()
     private var keyboardHook: KeyboardHook?
     private var permissionTimer: Timer?
@@ -30,6 +31,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         permissionMenuItem.isEnabled = false
         menu.addItem(permissionMenuItem)
         menu.addItem(.separator())
+        searchModeItem = NSMenuItem(title: "Stay Open to Search", action: #selector(toggleSearchMode), keyEquivalent: "")
+        searchModeItem.target = self
+        menu.addItem(searchModeItem)
         loginItem = NSMenuItem(title: "Start at Login", action: #selector(toggleLoginItem), keyEquivalent: "")
         loginItem.target = self
         menu.addItem(loginItem)
@@ -45,6 +49,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             ? (hooked ? "Accessibility: ✓ active" : "Accessibility: ✓ (hook failed — relaunch)")
             : "Accessibility: ✗ grant in System Settings"
         loginItem.state = (SMAppService.mainApp.status == .enabled) ? .on : .off
+        searchModeItem.state = Preferences.searchModeEnabled ? .on : .off
+    }
+
+    @objc private func toggleSearchMode() {
+        Preferences.searchModeEnabled.toggle()
     }
 
     @objc private func toggleLoginItem() {
