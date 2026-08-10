@@ -26,8 +26,8 @@ Menu-bar-only, no Dock icon, ~500 lines of Swift, zero dependencies.
 - Windows ordered front-to-back (most recently used first)
 - Panel auto-sizes to the longest title and centers on the screen under your mouse
 - Mouse support: hover to select, click to focus
-- Optional **Stay Open to Search** (menu bar toggle): the panel survives the ⌥
-  release so you can type to filter the list
+- Optional **Stay Open to Search** (menu bar toggle): a quick ⌥⇥ tap leaves the
+  panel up so you can type to filter the list
 
 ## Keys
 
@@ -40,8 +40,10 @@ Menu-bar-only, no Dock icon, ~500 lines of Swift, zero dependencies.
 
 ### Search mode
 
-With **Stay Open to Search** enabled (menu bar → toggle), releasing ⌥ leaves the
-panel up with a search field instead of committing:
+With **Stay Open to Search** enabled (menu bar → toggle), tapping ⌥⇥ and letting
+⌥ go within 250 ms leaves the panel up with a search field instead of
+committing. Keep ⌥ held down past that and the switcher stays classic: cycle
+with ⇥, release ⌥ to focus the highlighted window.
 
 | Keys        | Action                                        |
 |-------------|-----------------------------------------------|

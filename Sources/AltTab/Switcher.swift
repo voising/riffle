@@ -22,7 +22,13 @@ final class Switcher {
     /// Search mode as it was when this session started, so toggling the
     /// preference mid-session can't change the rules underneath the user.
     private var searchModeSession = false
+    /// When the session started, to tell a quick ⌥Tab tap from a held ⌥.
+    private var sessionStart = CFAbsoluteTimeGetCurrent()
     private var dismissMonitor: Any?
+
+    /// Release ⌥ within this long and the tap opens search; hold it longer and
+    /// the switcher behaves classically — releasing commits to the highlight.
+    private static let tapDuration: CFAbsoluteTime = 0.25
 
     var isSearching: Bool { model.isSearching }
 
@@ -39,6 +45,7 @@ final class Switcher {
         guard !windows.isEmpty else { return }
 
         searchModeSession = Preferences.searchModeEnabled
+        sessionStart = CFAbsoluteTimeGetCurrent()
         allWindows = windows
         model.query = ""
         model.isSearching = false
@@ -51,26 +58,26 @@ final class Switcher {
         isActive = true
         panel.present()
 
-        // A fast ⌥Tab tap can release Option before the panel is even up;
-        // commit immediately so it still switches to the previous window.
-        // In search mode the panel is meant to stay, so never shortcut it.
-        guard !searchModeSession else { return }
+        // A fast ⌥Tab tap can release Option before the panel is even up, so the
+        // flagsChanged event never reaches us: settle the session here instead.
         let optionStillDown = CGEventSource
             .flagsState(.combinedSessionState)
             .contains(.maskAlternate)
         if !optionStillDown {
-            commit()
+            optionReleased()
         }
     }
 
-    /// Option came back up: commit, or hand the panel over to search.
+    /// Option came back up. A quick tap hands the panel over to search; holding
+    /// ⌥ for longer means the user was cycling, so commit to the highlight.
     func optionReleased() {
         guard isActive else { return }
-        guard searchModeSession else {
+        guard !model.isSearching else { return }
+        let heldBriefly = CFAbsoluteTimeGetCurrent() - sessionStart < Self.tapDuration
+        guard searchModeSession, heldBriefly else {
             commit()
             return
         }
-        guard !model.isSearching else { return }
         model.isSearching = true
         panel.refit()
         startDismissMonitor()
