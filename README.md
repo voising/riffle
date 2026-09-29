@@ -1,4 +1,4 @@
-# AltTab
+# Riffle
 
 A minimal keyboard window switcher for the windows of the **current app**.
 Menu-bar-only, no Dock icon, ~500 lines of Swift, zero dependencies.
@@ -62,8 +62,8 @@ or any ⌘/⌃ shortcut, dismisses it.
 Requires macOS 13+ and Xcode command line tools.
 
 ```sh
-./build.sh              # builds build/AltTab.app
-open build/AltTab.app   # or copy to /Applications first
+./build.sh              # builds build/Riffle.app
+open build/Riffle.app   # or copy to /Applications first
 ```
 
 `build.sh` signs with the first available codesigning identity. This matters:

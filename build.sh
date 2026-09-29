@@ -1,14 +1,14 @@
 #!/bin/zsh
-# Builds AltTab and assembles a runnable .app bundle in build/.
+# Builds Riffle and assembles a runnable .app bundle in build/.
 set -euo pipefail
 cd "$(dirname "$0")"
 
 swift build -c release
 
-APP=build/AltTab.app
+APP=build/Riffle.app
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp .build/release/AltTab "$APP/Contents/MacOS/AltTab"
+cp .build/release/Riffle "$APP/Contents/MacOS/Riffle"
 cp Info.plist "$APP/Contents/Info.plist"
 cp branding/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 

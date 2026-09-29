@@ -3,11 +3,11 @@ import AppKit
 // Login can start us twice (a legacy shared-file-list item and the SMAppService
 // registration both fire). Two instances means two event taps and two ⌥⇥ panels,
 // so a late arrival bows out.
-let bundleID = Bundle.main.bundleIdentifier ?? "dev.voz.AltTab"
+let bundleID = Bundle.main.bundleIdentifier ?? "dev.voz.Riffle"
 let alreadyRunning = NSRunningApplication.runningApplications(withBundleIdentifier: bundleID)
     .contains { $0.processIdentifier != ProcessInfo.processInfo.processIdentifier }
 if alreadyRunning {
-    NSLog("AltTab: another instance is already running; exiting")
+    NSLog("Riffle: another instance is already running; exiting")
     exit(0)
 }
 

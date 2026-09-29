@@ -19,12 +19,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         statusItem.button?.image = NSImage(
             systemSymbolName: "rectangle.on.rectangle",
-            accessibilityDescription: "AltTab"
+            accessibilityDescription: "Riffle"
         )
 
         let menu = NSMenu()
         menu.delegate = self
-        let title = NSMenuItem(title: "AltTab — hold ⌥, press Tab", action: nil, keyEquivalent: "")
+        let title = NSMenuItem(title: "Riffle — hold ⌥, press Tab", action: nil, keyEquivalent: "")
         title.isEnabled = false
         menu.addItem(title)
         permissionMenuItem = NSMenuItem(title: "Accessibility: checking…", action: nil, keyEquivalent: "")
@@ -38,7 +38,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         loginItem.target = self
         menu.addItem(loginItem)
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: "Quit AltTab", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        menu.addItem(NSMenuItem(title: "Quit Riffle", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
         statusItem.menu = menu
     }
 
@@ -64,7 +64,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 try SMAppService.mainApp.register()
             }
         } catch {
-            NSLog("AltTab: failed to toggle login item: \(error)")
+            NSLog("Riffle: failed to toggle login item: \(error)")
             let alert = NSAlert()
             alert.messageText = "Couldn't change Start at Login"
             alert.informativeText = error.localizedDescription
@@ -91,12 +91,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let hook = KeyboardHook(switcher: switcher)
         if hook.start() {
             keyboardHook = hook
-            NSLog("AltTab: event tap installed, \u{2325}\u{21E5} is live")
+            NSLog("Riffle: event tap installed, \u{2325}\u{21E5} is live")
         } else {
-            NSLog("AltTab: event tap creation FAILED despite AXIsProcessTrusted")
+            NSLog("Riffle: event tap creation FAILED despite AXIsProcessTrusted")
             let alert = NSAlert()
-            alert.messageText = "AltTab could not capture keyboard events"
-            alert.informativeText = "Make sure AltTab is allowed under System Settings → Privacy & Security → Accessibility, then relaunch."
+            alert.messageText = "Riffle could not capture keyboard events"
+            alert.informativeText = "Make sure Riffle is allowed under System Settings → Privacy & Security → Accessibility, then relaunch."
             alert.runModal()
         }
     }

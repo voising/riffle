@@ -49,7 +49,7 @@ enum WindowDiscovery {
         AXUIElementSetMessagingTimeout(appElement, 0.25) // don't hang on stuck apps
 
         guard let elements: [AXUIElement] = attribute(appElement, kAXWindowsAttribute) else {
-            NSLog("AltTab: could not read AX windows for pid \(targetPID)")
+            NSLog("Riffle: could not read AX windows for pid \(targetPID)")
             return []
         }
 

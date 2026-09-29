@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>AltTab</string>
+	<string>Riffle</string>
 	<key>CFBundleDisplayName</key>
-	<string>AltTab</string>
+	<string>Riffle</string>
 	<key>CFBundleIdentifier</key>
-	<string>dev.voz.AltTab</string>
+	<string>dev.voz.Riffle</string>
 	<key>CFBundleExecutable</key>
-	<string>AltTab</string>
+	<string>Riffle</string>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
 	<key>CFBundlePackageType</key>

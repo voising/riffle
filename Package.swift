@@ -2,12 +2,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "AltTab",
+    name: "Riffle",
     platforms: [.macOS(.v13)],
     targets: [
         .executableTarget(
-            name: "AltTab",
-            path: "Sources/AltTab"
+            name: "Riffle",
+            path: "Sources/Riffle"
         )
     ]
 )
