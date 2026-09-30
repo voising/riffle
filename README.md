@@ -3,21 +3,10 @@
 A minimal keyboard window switcher for the windows of the **current app**.
 Menu-bar-only, no Dock icon, ~500 lines of Swift, zero dependencies.
 
-```
-            hold ⌥ … press ⇥
-                   │
-                   ▼
-     ┌───────────────────────────┐
-     │  [i] Terminal             │
-     │  ┌───────────────────────┐│
-     │  │ ▸ window title 2      ││  ◀ selected
-     │  └───────────────────────┘│
-     │    window title 1         │
-     │    window title 3      ⊖  │  ◀ minimized
-     └───────────────────────────┘
-                   │
-          release ⌥ → window focused
-```
+<p align="center">
+  <img src="branding/screenshots/switcher.png" width="460" alt="Riffle switcher listing Terminal windows">
+  <img src="branding/screenshots/search.png" width="540" alt="Riffle search mode filtering by \"api\"">
+</p>
 
 ## Features
 
