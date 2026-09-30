@@ -5,7 +5,7 @@ Menu-bar-only, no Dock icon, ~500 lines of Swift, zero dependencies.
 
 <p align="center">
   <img src="branding/screenshots/switcher.png" width="460" alt="Riffle switcher listing Terminal windows">
-  <img src="branding/screenshots/search.png" width="540" alt="Riffle search mode filtering by \"api\"">
+  <img src="branding/screenshots/search.png" width="540" alt="Riffle search mode filtering by api">
 </p>
 
 ## Features
