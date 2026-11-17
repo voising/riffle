@@ -7,11 +7,6 @@ Menu-bar-only, no Dock icon, ~500 lines of Swift, zero dependencies.
   <img src="branding/demo.gif" width="800" alt="Riffle demo: cycling windows with ⌥⇥, restoring a minimized window, and searching">
 </p>
 
-<p align="center">
-  <img src="branding/screenshots/switcher.png" width="460" alt="Riffle switcher listing Terminal windows">
-  <img src="branding/screenshots/search.png" width="540" alt="Riffle search mode filtering by api">
-</p>
-
 ## Features
 
 - Hold ⌥, tap ⇥ — cycle through every window of the frontmost app as a title list
